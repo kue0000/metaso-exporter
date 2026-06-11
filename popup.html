@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Metaso Exporter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 300px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #ffffff; color: #1a1a2e;
+    }
+    .header {
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      padding: 20px; color: white;
+    }
+    .header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .header p { font-size: 12px; opacity: 0.85; }
+    .content { padding: 16px; }
+    .status {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; border-radius: 10px;
+      font-size: 13px; margin-bottom: 16px;
+    }
+    .status.ready { background: #ecfdf5; color: #059669; }
+    .status.not-ready { background: #fef2f2; color: #dc2626; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .status.ready .status-dot { background: #059669; }
+    .status.not-ready .status-dot { background: #dc2626; }
+    .export-btn {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border: 1px solid #e5e7eb;
+      border-radius: 12px; background: white; cursor: pointer;
+      transition: all 0.15s ease; font-family: inherit; width: 100%;
+    }
+    .export-btn:hover {
+      border-color: #2563eb; background: #f0f4ff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+    }
+    .export-btn:active { transform: translateY(0); }
+    .export-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .export-btn:disabled:hover {
+      border-color: #e5e7eb; background: white;
+      transform: none; box-shadow: none;
+    }
+    .export-btn .icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; background: #eff6ff; color: #2563eb;
+    }
+    .export-btn .info { flex: 1; text-align: left; }
+    .export-btn .info .name { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+    .export-btn .info .desc { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+    .footer {
+      padding: 12px 16px; border-top: 1px solid #f3f4f6;
+      text-align: center; font-size: 11px; color: #d1d5db;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Metaso Exporter</h1>
+    <p>一键导出秘塔AI搜索结果</p>
+  </div>
+
+  <div class="content">
+    <div class="status not-ready" id="status">
+      <div class="status-dot"></div>
+      <span id="status-text">正在检测页面...</span>
+    </div>
+
+    <button class="export-btn" data-format="markdown" disabled>
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <div class="info">
+        <div class="name">导出 Markdown</div>
+        <div class="desc">适合编辑器和笔记软件</div>
+      </div>
+    </button>
+  </div>
+
+  <div class="footer">
+    Metaso Exporter v1.0 · 支持简洁 / 深入 / 深度研究
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
