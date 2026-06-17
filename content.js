@@ -22,6 +22,14 @@
     return str.replace(/[\\/:*?"<>|]/g, "_").substring(0, 80);
   }
 
+  /** 生成带时间戳前缀的文件名 (YYYY-MM-DD_HHmm_title.ext) */
+  function getTimestampedFilename(title, ext) {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const ts = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+    return `${ts}_${safeFilename(title)}.${ext}`;
+  }
+
   // ==================== 页面内容提取 ====================
 
   /** 检测当前页面是否包含搜索结果 */
@@ -404,7 +412,7 @@
   function exportMarkdown() {
     const data = extractFullData();
     const md = buildMarkdownString();
-    downloadFile(safeFilename(data.title) + ".md", md, "text/markdown;charset=utf-8");
+    downloadFile(getTimestampedFilename(data.title, "md"), md, "text/markdown;charset=utf-8");
     showToast("Markdown 导出成功!");
   }
 
@@ -457,7 +465,7 @@
     const data = extractFullData();
     const md = buildMarkdownString();
     const plain = markdownToPlainText(md);
-    downloadFile(safeFilename(data.title) + ".txt", plain, "text/plain;charset=utf-8");
+    downloadFile(getTimestampedFilename(data.title, "txt"), plain, "text/plain;charset=utf-8");
     showToast("纯文本导出成功!");
   }
 
