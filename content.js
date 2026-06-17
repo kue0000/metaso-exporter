@@ -10,16 +10,11 @@
 
   // ==================== 工具函数 ====================
 
-  /** 获取当前时间戳字符串 */
+  /** 获取当前时间戳字符串 (YYYY-MM-DD HH:MM) */
   function getTimestamp() {
     const now = new Date();
-    return now.toLocaleString("zh-CN", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   }
 
   /** 生成文件名安全字符串 */
