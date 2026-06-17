@@ -489,20 +489,12 @@
     const toast = document.createElement("div");
     toast.id = "metaso-exporter-toast";
     toast.textContent = message;
-    toast.style.cssText = `
-      position: fixed; bottom: 30px; right: 30px;
-      padding: 14px 24px; border-radius: 10px;
-      color: white; font-size: 14px; font-weight: 500;
-      z-index: 2147483647; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      transition: opacity 0.3s ease;
-      background: ${isError ? "#ef4444" : "#10b981"};
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    `;
+    if (isError) toast.classList.add("error");
     document.body.appendChild(toast);
     setTimeout(() => {
       toast.style.opacity = "0";
       setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    }, 1500);
   }
 
   // ==================== 悬浮导出按钮 UI ====================
