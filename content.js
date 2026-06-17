@@ -347,8 +347,8 @@
     let md = "";
 
     md += `# ${data.title}\n\n`;
+    md += `> 自动生成于 ${data.timestamp}  \n`;
     md += `> 搜索模式: ${data.mode}  \n`;
-    md += `> 导出时间: ${data.timestamp}  \n`;
     md += `> 来源: ${data.url}\n\n`;
     md += `---\n\n`;
 
