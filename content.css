@@ -80,28 +80,32 @@
   flex-shrink: 0;
 }
 
-/* Toast 提示样式 */
+/* Toast 提示样式 - 用 !important 防止秘塔页面 CSS 污染 */
 #metaso-exporter-toast {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  z-index: 2147483647;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: white;
-  background: #10b981;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
-  transition: opacity 0.3s ease;
-  pointer-events: none;
+  all: initial !important;
+  position: fixed !important;
+  bottom: 30px !important;
+  right: 30px !important;
+  z-index: 2147483647 !important;
+  padding: 8px 16px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #fff !important;
+  background: #10b981 !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12) !important;
+  transition: opacity 0.3s ease !important;
+  pointer-events: none !important;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-    "Microsoft YaHei", sans-serif;
-  max-width: 240px;
-  width: auto;
-  height: auto;
+    "Microsoft YaHei", sans-serif !important;
+  max-width: 240px !important;
+  width: auto !important;
+  height: auto !important;
+  display: block !important;
+  line-height: 1.4 !important;
+  box-sizing: border-box !important;
 }
 
 #metaso-exporter-toast.error {
-  background: #ef4444;
+  background: #ef4444 !important;
 }
