@@ -339,9 +339,10 @@
     return md.trim();
   }
 
-  // ==================== 导出为 Markdown ====================
+  // ==================== 构建 Markdown 字符串 ====================
 
-  function exportMarkdown() {
+  /** 生成当前搜索结果的完整 Markdown 字符串（不下载） */
+  function buildMarkdownString() {
     const data = extractFullData();
     let md = "";
 
@@ -362,12 +363,9 @@
       md += `\n---\n\n`;
     }
 
-    // 按轮次输出每轮问答
     data.turns.forEach((turn, index) => {
       const turnLabel = data.turns.length > 1 ? `（第${index + 1}轮）` : "";
-
       md += `## 提问${turnLabel}: ${turn.question}\n\n`;
-
       turn.answers.forEach((content) => {
         if (content.type === "reference-preview") {
           md += `> **摘要**: ${content.text}\n\n`;
@@ -376,8 +374,6 @@
           md += htmlToMarkdown(content.html) + "\n\n";
         }
       });
-
-      // 输出脚注定义（参考文献，带原始链接）
       if (turn.sources.length > 0) {
         turn.sources.forEach((src) => {
           if (src.url) {
@@ -388,10 +384,7 @@
         });
         md += `\n`;
       }
-
-      if (index < data.turns.length - 1) {
-        md += `---\n\n`;
-      }
+      if (index < data.turns.length - 1) { md += `---\n\n`; }
     });
 
     if (data.relatedTopics.length > 0) {
@@ -409,8 +402,68 @@
       data.followUps.forEach((q) => { md += `- ${q}\n`; });
     }
 
+    return md;
+  }
+
+  /** 导出为 Markdown 文件 */
+  function exportMarkdown() {
+    const data = extractFullData();
+    const md = buildMarkdownString();
     downloadFile(safeFilename(data.title) + ".md", md, "text/markdown;charset=utf-8");
     showToast("Markdown 导出成功!");
+  }
+
+  // ==================== 纯文本转换 & 剪贴板 ====================
+
+  /** 将 Markdown 转为纯文本（去掉语法标记） */
+  function markdownToPlainText(md) {
+    return md
+      .replace(/^#{1,6}\s+/gm, "")
+      .replace(/\*\*(.+?)\*\*/g, "$1")
+      .replace(/\*(.+?)\*/g, "$1")
+      .replace(/`([^`]+)`/g, "$1")
+      .replace(/```[\s\S]*?```/g, (m) => m.replace(/```\w*\n?/g, "").replace(/```/g, ""))
+      .replace(/^\s*[-*+]\s+/gm, "• ")
+      .replace(/^\s*>\s*/gm, "")
+      .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+      .replace(/\[\^(\d+)\]/g, "[$1]")
+      .replace(/^\[\^?\d+\]:\s*/gm, "")
+      .replace(/^---+$/gm, "————————")
+      .replace(/\n{3,}/g, "\n\n");
+  }
+
+  /** 复制到剪贴板（带降级方案） */
+  async function copyToClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (e) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.cssText = "position:fixed;left:-9999px;top:-9999px;opacity:0";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    }
+  }
+
+  /** 复制 Markdown 到剪贴板 */
+  async function exportClipboard() {
+    const md = buildMarkdownString();
+    const ok = await copyToClipboard(md);
+    showToast(ok ? "Markdown 已复制到剪贴板!" : "复制失败，请手动复制", !ok);
+  }
+
+  /** 导出纯文本文件 */
+  function exportPlainText() {
+    const data = extractFullData();
+    const md = buildMarkdownString();
+    const plain = markdownToPlainText(md);
+    downloadFile(safeFilename(data.title) + ".txt", plain, "text/plain;charset=utf-8");
+    showToast("纯文本导出成功!");
   }
 
   // ==================== 文件下载工具 ====================
@@ -460,7 +513,33 @@
     const panel = document.createElement("div");
     panel.id = "metaso-exporter-panel";
     panel.innerHTML = `
-      <div id="metaso-exporter-trigger" title="导出秘塔搜索结果为 Markdown">
+      <div id="metaso-exporter-menu" class="metaso-menu">
+        <div class="metaso-menu-item" data-action="md">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>导出 .md</span>
+        </div>
+        <div class="metaso-menu-item" data-action="copy">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <span>复制到剪贴板</span>
+        </div>
+        <div class="metaso-menu-item" data-action="txt">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          <span>导出纯文本</span>
+        </div>
+      </div>
+      <div id="metaso-exporter-trigger" title="导出秘塔搜索结果">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
           <polyline points="7 10 12 15 17 10"/>
@@ -471,13 +550,41 @@
     document.body.appendChild(panel);
 
     const trigger = document.getElementById("metaso-exporter-trigger");
-    trigger.addEventListener("click", (e) => {
-      e.stopPropagation();
+    const menu = document.getElementById("metaso-exporter-menu");
+    let menuOpen = false;
+
+    function toggleMenu() {
       if (!hasSearchResult()) {
         showToast("请先执行搜索后再导出", true);
         return;
       }
-      exportMarkdown();
+      menuOpen = !menuOpen;
+      menu.classList.toggle("metaso-menu-open", menuOpen);
+    }
+
+    function closeMenu() {
+      menuOpen = false;
+      menu.classList.remove("metaso-menu-open");
+    }
+
+    trigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    menu.querySelectorAll(".metaso-menu-item").forEach((item) => {
+      item.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const action = item.getAttribute("data-action");
+        if (action === "md") exportMarkdown();
+        else if (action === "copy") exportClipboard();
+        else if (action === "txt") exportPlainText();
+        closeMenu();
+      });
+    });
+
+    document.addEventListener("click", () => {
+      if (menuOpen) closeMenu();
     });
   }
 
@@ -529,7 +636,10 @@
         sendResponse({ success: false, error: "No search result" });
         return;
       }
-      exportMarkdown();
+      const format = request.format || "markdown";
+      if (format === "clipboard") exportClipboard();
+      else if (format === "text") exportPlainText();
+      else exportMarkdown();
       sendResponse({ success: true });
     }
     return true;

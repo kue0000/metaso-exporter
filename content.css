@@ -35,6 +35,51 @@
   transform: translateY(0) scale(0.98);
 }
 
+/* 展开菜单 */
+.metaso-menu {
+  position: absolute;
+  bottom: 56px;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  padding: 6px;
+  min-width: 160px;
+  opacity: 0;
+  transform: translateY(8px) scale(0.95);
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.metaso-menu.metaso-menu-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.metaso-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+.metaso-menu-item:hover {
+  background: #f0f4ff;
+  color: #2563eb;
+}
+
+.metaso-menu-item svg {
+  flex-shrink: 0;
+}
+
 /* Toast 提示样式 */
 #metaso-exporter-toast {
   position: fixed;

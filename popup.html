@@ -81,13 +81,41 @@
       </div>
       <div class="info">
         <div class="name">导出 Markdown</div>
-        <div class="desc">适合编辑器和笔记软件</div>
+        <div class="desc">下载 .md 文件</div>
+      </div>
+    </button>
+
+    <button class="export-btn" data-format="clipboard" disabled style="margin-top:8px">
+      <div class="icon" style="background:#f0fdf4;color:#16a34a">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+      </div>
+      <div class="info">
+        <div class="name">复制到剪贴板</div>
+        <div class="desc">Markdown 格式，直接粘贴到笔记</div>
+      </div>
+    </button>
+
+    <button class="export-btn" data-format="text" disabled style="margin-top:8px">
+      <div class="icon" style="background:#fef3c7;color:#d97706">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <div class="info">
+        <div class="name">导出纯文本</div>
+        <div class="desc">下载 .txt，适合粘贴到微信/飞书</div>
       </div>
     </button>
   </div>
 
   <div class="footer">
-    Metaso Exporter v1.0 · 支持简洁 / 深入 / 深度研究
+    Metaso Exporter v1.1 · Markdown / 纯文本 / 剪贴板
   </div>
 
   <script src="popup.js"></script>
