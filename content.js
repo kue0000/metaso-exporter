@@ -296,6 +296,12 @@
       if (node.nodeType !== Node.ELEMENT_NODE) return "";
 
       const tag = node.tagName.toLowerCase();
+
+      // 表格特殊处理：直接解析 DOM 生成标准 Markdown 表格
+      if (tag === "table") {
+        return processTable(node);
+      }
+
       let inner = "";
       node.childNodes.forEach((child) => { inner += processNode(child); });
 
@@ -320,9 +326,7 @@
         case "br": return "\n";
         case "hr": return "\n---\n\n";
         case "blockquote": return "> " + inner.trim() + "\n\n";
-        case "table": return "\n" + inner + "\n";
-        case "thead": return inner;
-        case "tbody": return inner;
+        case "thead": case "tbody": case "tfoot": return inner;
         case "tr": return "| " + inner + "\n";
         case "th": case "td": return inner.trim() + " | ";
         case "img":
@@ -335,6 +339,56 @@
         case "div": return inner + "\n";
         default: return inner;
       }
+    }
+
+    /** 直接从 DOM 解析 <table> 生成标准 Markdown 表格 */
+    function processTable(tableEl) {
+      const rows = tableEl.querySelectorAll("tr");
+      if (rows.length === 0) return "";
+
+      const data = [];
+      let hasHeader = false;
+
+      rows.forEach((row) => {
+        const cells = [];
+        row.querySelectorAll("th, td").forEach((cell) => {
+          // 提取单元格纯文本（递归处理内部节点）
+          let text = "";
+          cell.childNodes.forEach((child) => { text += processNode(child); });
+          text = text.trim().replace(/\|/g, "\\|").replace(/\n/g, " ");
+          cells.push(text);
+        });
+        if (cells.length > 0) {
+          if (row.querySelector("th")) hasHeader = true;
+          data.push(cells);
+        }
+      });
+
+      if (data.length === 0) return "";
+
+      // 统一列数（取最大列数）
+      const colCount = Math.max(...data.map(r => r.length));
+      data.forEach(r => { while (r.length < colCount) r.push(""); });
+
+      let result = "\n";
+
+      // 如果没有 th 行，第一行作为表头
+      if (!hasHeader && data.length > 0) {
+        result += "| " + data[0].join(" | ") + " |\n";
+        result += "| " + data[0].map(() => "---").join(" | ") + " |\n";
+        for (let i = 1; i < data.length; i++) {
+          result += "| " + data[i].join(" | ") + " |\n";
+        }
+      } else {
+        // 第一行是 th 表头
+        result += "| " + data[0].join(" | ") + " |\n";
+        result += "| " + data[0].map(() => "---").join(" | ") + " |\n";
+        for (let i = 1; i < data.length; i++) {
+          result += "| " + data[i].join(" | ") + " |\n";
+        }
+      }
+
+      return result + "\n";
     }
 
     div.childNodes.forEach((child) => { md += processNode(child); });
